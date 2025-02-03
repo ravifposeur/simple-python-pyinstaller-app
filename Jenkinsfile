@@ -9,4 +9,7 @@ node {
             sh 'py.test --verbose --junit-xml test-reports/results.xml sources/test_calc.py'
         }
     }
+    stage('Publish test results') {
+        junit 'test-reports/results.xml'
+    }
 }
