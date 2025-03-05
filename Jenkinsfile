@@ -16,13 +16,13 @@ node {
     }
     
     stage('Deliver') {
-    docker.image('cdrx/pyinstaller-linux:python2').inside {
-        sh '''
-        pyinstaller --onefile sources/add2vals.py
-        ls -l dist/
-        '''
+        docker.image('cdrx/pyinstaller-linux:python2').inside('--entrypoint=""') {
+            sh '''
+            pyinstaller --onefile sources/add2vals.py
+            ls -lah dist/  # Debugging untuk memastikan file berhasil dibuat
+            '''
         }
-    archiveArtifacts artifacts: 'dist/add2vals', fingerprint: true
+        archiveArtifacts artifacts: 'dist/add2vals', fingerprint: true, onlyIfSuccessful: true
     }
     
     stage('Manual Approval') {
