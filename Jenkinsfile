@@ -23,15 +23,15 @@ node {
     }
 
     stage('Deploy') {
-        docker.image('cdrx/pyinstaller-linux:python2').inside {
-            sh 'pyinstaller --onefile sources/add2vals.py'
+        docker.image('python:2-alpine').inside {
+            sh '''
+                apk add --no-cache py-pip
+                pip install pyinstaller
+                pyinstaller --onefile sources/add2vals.py
+            '''
             echo 'Pipeline has finished successfully.'
         }
-        
-        post {
-            success {
-                archiveArtifacts 'dist/add2vals'
-            }
-        }
     }
+
+    archiveArtifacts 'dist/add2vals'
 }
