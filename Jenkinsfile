@@ -16,10 +16,20 @@ node {
     }
     
     stage('Deliver') {
-        docker.image('cdrx/pyinstaller-linux:python2').inside {
-            sh 'pyinstaller --onefile sources/add2vals.py'
+    docker.image('cdrx/pyinstaller-linux:python2').inside {
+        sh '''
+        pyinstaller --onefile sources/add2vals.py
+        ls -l dist/
+        '''
         }
-        archiveArtifacts 'dist/add2vals'
+    archiveArtifacts artifacts: 'dist/add2vals', fingerprint: true
+    }
+    
+    stage('Manual Approval') {
+        input {
+            message "Lanjutkan ke tahap Deploy?"
+            ok "Proceed"
+        }
     }
     
     stage('Deploy') {
@@ -29,5 +39,8 @@ node {
         
         sh "scp -i ${pem_key} dist/add2vals ${ec2_user}@${ec2_host}:/opt/application/"
         sh "ssh -i ${pem_key} ${ec2_user}@${ec2_host} 'chmod +x /opt/application/add2vals && sudo systemctl restart app-service'"
+        
+        echo "Aplikasi berjalan selama 1 menit sebelum pipeline selesai..."
+        sh "sleep 60"
     }
 }
