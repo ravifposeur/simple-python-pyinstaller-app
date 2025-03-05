@@ -13,11 +13,7 @@ node {
     }
     
     stage('Publish test results') {
-        post {
-            always {
                 junit 'test-reports/results.xml'
-            }
-        }
     }
     
     stage('Approval') {
