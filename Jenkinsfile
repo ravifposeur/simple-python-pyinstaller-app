@@ -1,13 +1,13 @@
 node {
     stage('Build') {
-        docker.image('python:2-alpine').inside {
+        docker.image('python:2-alpine').inside('-u 0') {  // Menjalankan container sebagai root
             sh 'python -m py_compile sources/add2vals.py sources/calc.py'
             stash(name: 'compiled-results', includes: 'sources/*.py*')
         }
     }
     
     stage('Test') {
-        docker.image('qnib/pytest').inside {
+        docker.image('qnib/pytest').inside('-u 0') {
             sh 'py.test --verbose --junit-xml test-reports/results.xml sources/test_calc.py'
         }
     }
@@ -23,7 +23,7 @@ node {
     }
 
     stage('Deploy') {
-        docker.image('python:2-alpine').inside {
+        docker.image('python:2-alpine').inside('-u 0') {  // Pastikan dijalankan sebagai root
             sh '''
                 apk add --no-cache py-pip
                 pip install pyinstaller
